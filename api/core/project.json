@@ -1,0 +1,39 @@
+{
+  "name": "core",
+  "$schema": "../../node_modules/nx/schemas/nx-schema.json",
+  "sourceRoot": "api/core/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "ouputs": ["{options.outputPath}"],
+      "options": {
+        "platform": "node",
+        "outputPath": "dist/api/core",
+        "format": ["cjs"],
+        "thirdParty": true,
+        "bundle": true,
+        "sourcemap": "linked",
+        "minify": true,
+        "main": "api/core/src/handler.ts",
+        "tsConfig": "api/core/tsconfig.app.json",
+        "generatePackageJson": false
+      }
+    },
+    "test-type": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "cwd": "api/core",
+        "commands": ["tsc -p tsconfig.app.json --noEmit"]
+      }
+    },
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "api/core",
+        "commands": ["wrangler dev src/app.ts"]
+      }
+    }
+  }
+}

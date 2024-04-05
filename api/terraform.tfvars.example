@@ -1,0 +1,4 @@
+environment = {
+  project_name = "PullDating"
+}
+supabase_url = "<SUPABASE_URL>"
