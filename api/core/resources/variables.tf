@@ -13,3 +13,12 @@ variable "function_ssm_parameter_names" {
   type        = set(string)
   default     = []
 }
+
+variable "supabase_url_parameter_name" {
+  description = "The name of the SSM parameter for the Supabase URL"
+  type        = string
+}
+variable "supabase_url_parameter_arn" {
+  description = "The ARN of the SSM parameter for the Supabase URL"
+  type        = string
+}

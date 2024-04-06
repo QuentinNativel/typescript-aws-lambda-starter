@@ -10,6 +10,11 @@ resource "aws_lambda_function" "core" {
   handler       = "handler.main"
   runtime       = "nodejs20.x"
   role          = aws_iam_role.role.arn
+  environment {
+    variables = {
+      SUPABASE_URL_NAME = var.supabase_url_parameter_name
+    }
+  }
   logging_config {
     application_log_level = "INFO"
     log_format            = "JSON"
@@ -39,19 +44,6 @@ resource "aws_s3_object" "object" {
   source = data.archive_file.file.output_path
   etag   = filemd5("${data.archive_file.file.output_path}")
 
-}
-
-resource "aws_ssm_parameter" "function_ssm_parameters" {
-  for_each = var.function_ssm_parameter_names
-  name     = "/projects/${var.environment.project_name}/lambda/${local.name}/${each.value}"
-  type     = "SecureString"
-  key_id   = data.aws_kms_alias.ssm.arn
-  value    = "1"
-  lifecycle {
-    ignore_changes = [
-      value,
-    ]
-  }
 }
 
 resource "aws_cloudwatch_log_group" "logs" {
@@ -100,13 +92,13 @@ data "aws_iam_policy_document" "policy_document" {
     effect    = "Allow"
     resources = ["arn:aws:logs:${data.aws_region.this.id}:${data.aws_caller_identity.this.id}:*"]
   }
-  #   statement {
-  #     sid = "workWithSSMParameters"
-  #     actions = [
-  #       "ssm:GetParameter",
-  #       "ssm:PutParameter"
-  #     ]
-  #     effect    = "Allow"
-  #     resources = [for item in aws_ssm_parameter.function_ssm_parameters : item.arn]
-  #   }
+  statement {
+    sid = "workWithSSMParameters"
+    actions = [
+      "ssm:GetParameter",
+      "ssm:PutParameter"
+    ]
+    effect    = "Allow"
+    resources = [var.supabase_url_parameter_arn]
+  }
 }

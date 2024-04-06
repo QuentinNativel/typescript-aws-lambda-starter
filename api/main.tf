@@ -10,6 +10,8 @@ module "core" {
       deployment = aws_s3_bucket.deployment.bucket
     }
   }
+  supabase_url_parameter_name = aws_ssm_parameter.supabase_url.name
+  supabase_url_parameter_arn  = aws_ssm_parameter.supabase_url.arn
 }
 
 resource "aws_s3_bucket" "deployment" {
@@ -89,4 +91,11 @@ resource "aws_apigatewayv2_route" "core_route" {
   api_id    = aws_apigatewayv2_api.api.id
   route_key = "ANY /core/{proxy+}"
   target    = "integrations/${aws_apigatewayv2_integration.core.id}"
+}
+
+resource "aws_ssm_parameter" "supabase_url" {
+  name  = "/projects/${var.environment.project_name}/lambda/core/SUPABASE_URL"
+  type  = "SecureString"
+  value = var.supabase_url
+
 }
